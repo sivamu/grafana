@@ -19,7 +19,6 @@ import {
 } from '@grafana/data/src/utils/OptionsUIBuilders';
 import { PanelOptionsSupplier } from '@grafana/data/src/panel/PanelPlugin';
 import { getOptionOverrides } from './state/getOptionOverrides';
-import { PanelModel } from '../../state';
 
 type categoryGetter = (categoryNames?: string[]) => OptionsPaneCategoryDescriptor;
 
