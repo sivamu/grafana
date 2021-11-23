@@ -1,5 +1,11 @@
 import React from 'react';
-import { StandardEditorContext, VariableSuggestionsScope } from '@grafana/data';
+import {
+  EventBus,
+  InterpolateFunction,
+  PanelData,
+  StandardEditorContext,
+  VariableSuggestionsScope,
+} from '@grafana/data';
 import { get as lodashGet } from 'lodash';
 import { getDataLinksVariableSuggestions } from 'app/features/panel/panellinks/link_srv';
 import { OptionPaneRenderProps } from './types';
@@ -13,24 +19,52 @@ import {
 } from '@grafana/data/src/utils/OptionsUIBuilders';
 import { PanelOptionsSupplier } from '@grafana/data/src/panel/PanelPlugin';
 import { getOptionOverrides } from './state/getOptionOverrides';
+import { PanelModel } from '../../state';
 
 type categoryGetter = (categoryNames?: string[]) => OptionsPaneCategoryDescriptor;
+
+interface GetStandardEditorContextProps {
+  data: PanelData | undefined;
+  replaceVariables: InterpolateFunction;
+  options: Record<string, unknown>;
+  eventBus: EventBus;
+  instanceState: OptionPaneRenderProps['instanceState'];
+}
+
+export function getStandardEditorContext({
+  data,
+  replaceVariables,
+  options,
+  eventBus,
+  instanceState,
+}: GetStandardEditorContextProps): StandardEditorContext<unknown, unknown> {
+  const dataSeries = data?.series ?? [];
+
+  const context: StandardEditorContext<unknown, unknown> = {
+    data: dataSeries,
+    replaceVariables,
+    options,
+    eventBus,
+    getSuggestions: (scope?: VariableSuggestionsScope) => getDataLinksVariableSuggestions(dataSeries, scope),
+    instanceState,
+  };
+
+  return context;
+}
 
 export function getVizualizationOptions(props: OptionPaneRenderProps): OptionsPaneCategoryDescriptor[] {
   const { plugin, panel, onPanelOptionsChanged, onFieldConfigsChange, data, dashboard, instanceState } = props;
   const currentOptions = panel.getOptions();
   const currentFieldConfig = panel.fieldConfig;
   const categoryIndex: Record<string, OptionsPaneCategoryDescriptor> = {};
-  const dataSeries = data?.series ?? [];
 
-  const context: StandardEditorContext<any, any> = {
-    data: dataSeries,
+  const context = getStandardEditorContext({
+    data,
     replaceVariables: panel.replaceVariables,
     options: currentOptions,
     eventBus: dashboard.events,
-    getSuggestions: (scope?: VariableSuggestionsScope) => getDataLinksVariableSuggestions(dataSeries, scope),
     instanceState,
-  };
+  });
 
   const getOptionsPaneCategory = (categoryNames?: string[]): OptionsPaneCategoryDescriptor => {
     const categoryName = (categoryNames && categoryNames[0]) ?? `${plugin.meta.name}`;
