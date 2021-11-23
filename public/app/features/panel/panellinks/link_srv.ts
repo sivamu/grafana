@@ -201,7 +201,7 @@ export const getDataFrameVars = (dataFrames: DataFrame[]) => {
 };
 
 export const getDataLinksVariableSuggestions = (
-  dataFrames: DataFrame[] = [],
+  dataFrames: DataFrame[],
   scope?: VariableSuggestionsScope
 ): VariableSuggestion[] => {
   const valueTimeVar = {

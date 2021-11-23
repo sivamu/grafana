@@ -3,7 +3,7 @@ import { StandardEditorContext, VariableSuggestionsScope } from '@grafana/data';
 import { get as lodashGet } from 'lodash';
 import { getDataLinksVariableSuggestions } from 'app/features/panel/panellinks/link_srv';
 import { OptionPaneRenderProps } from './types';
-import { updateDefaultFieldConfigValue, setOptionImmutably } from './utils';
+import { setOptionImmutably, updateDefaultFieldConfigValue } from './utils';
 import { OptionsPaneItemDescriptor } from './OptionsPaneItemDescriptor';
 import { OptionsPaneCategoryDescriptor } from './OptionsPaneCategoryDescriptor';
 import {
@@ -21,15 +21,14 @@ export function getVizualizationOptions(props: OptionPaneRenderProps): OptionsPa
   const currentOptions = panel.getOptions();
   const currentFieldConfig = panel.fieldConfig;
   const categoryIndex: Record<string, OptionsPaneCategoryDescriptor> = {};
+  const dataSeries = data?.series ?? [];
 
   const context: StandardEditorContext<any, any> = {
-    data: data?.series || [],
+    data: dataSeries,
     replaceVariables: panel.replaceVariables,
     options: currentOptions,
     eventBus: dashboard.events,
-    getSuggestions: (scope?: VariableSuggestionsScope) => {
-      return getDataLinksVariableSuggestions(data?.series ?? [], scope);
-    },
+    getSuggestions: (scope?: VariableSuggestionsScope) => getDataLinksVariableSuggestions(dataSeries, scope),
     instanceState,
   };
 
