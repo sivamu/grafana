@@ -28,7 +28,7 @@ export function getVizualizationOptions(props: OptionPaneRenderProps): OptionsPa
     options: currentOptions,
     eventBus: dashboard.events,
     getSuggestions: (scope?: VariableSuggestionsScope) => {
-      return data ? getDataLinksVariableSuggestions(data.series, scope) : [];
+      return getDataLinksVariableSuggestions(data?.series ?? [], scope);
     },
     instanceState,
   };
