@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/grafana/grafana/pkg/infra/log"
 	"github.com/grafana/grafana/pkg/models"
 	"github.com/grafana/grafana/pkg/util/errutil"
 
@@ -27,6 +28,10 @@ type azureClaims struct {
 	Name              string   `json:"name"`
 	ID                string   `json:"oid"`
 }
+
+var (
+	azureoauthLogger = log.New("azureoauth")
+)
 
 func (s *SocialAzureAD) Type() int {
 	return int(models.AZUREAD)
@@ -79,6 +84,7 @@ func (s *SocialAzureAD) IsGroupMember(groups []string) bool {
 
 	for _, allowedGroup := range s.allowedGroups {
 		for _, group := range groups {
+			azureoauthLogger.Info("allowed group", "allowedGroup", allowedGroup, "memberGroup", group)
 			if group == allowedGroup {
 				return true
 			}
