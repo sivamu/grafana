@@ -136,5 +136,8 @@ func hasRole(roles []string, role models.RoleType) bool {
 func extractGroups(claims azureClaims) []string {
 	groups := make([]string, 0)
 	groups = append(groups, claims.Groups...)
+	for _, group := range groups {
+		azureoauthLogger.Info("claim groups", "group", group)
+	}
 	return groups
 }
