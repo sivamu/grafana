@@ -27,6 +27,7 @@ type azureClaims struct {
 	Groups            []string `json:"groups"`
 	Name              string   `json:"name"`
 	ID                string   `json:"oid"`
+	HasGroups         bool     `json:"hasgroups"`
 }
 
 var (
@@ -60,8 +61,10 @@ func (s *SocialAzureAD) UserInfo(_ *http.Client, token *oauth2.Token) (*BasicUse
 
 	role := extractRole(claims, s.autoAssignOrgRole)
 	logger.Debug("AzureAD OAuth: extracted role", "email", email, "role", role)
+	azureoauthLogger.Info("AzureAD OAuth: extracted role", "email", email, "role", role)
 
 	groups := extractGroups(claims)
+	azureoauthLogger.Info("AzureAD OAuth: extracted groups", "email", email, "groups", groups, "has_groups", claims.HasGroups)
 	logger.Debug("AzureAD OAuth: extracted groups", "email", email, "groups", groups)
 	if !s.IsGroupMember(groups) {
 		return nil, errMissingGroupMembership
